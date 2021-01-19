@@ -8,6 +8,7 @@
     "build"
   ],
   "compilerOptions": {
+    "module": "ES2020",
     "outDir": "build",
     "rootDir": "./",
     "sourceMap": true,

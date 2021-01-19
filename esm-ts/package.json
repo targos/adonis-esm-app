@@ -2,10 +2,11 @@
   "name": "commonjs-ts",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "node ace build --production",
+    "build": "node ace.js build --production",
     "start": "node server.js",
-    "dev": "node ace serve --watch"
+    "dev": "node ace.js serve --watch"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^3.0.6",
