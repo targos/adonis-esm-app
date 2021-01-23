@@ -1,3 +1,17 @@
+import { readFile } from 'fs/promises'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+import { loadCompiler } from '@adonisjs/require-ts'
+
+const appRoot = dirname(fileURLToPath(import.meta.url))
+
+const tsConfig = JSON.parse(await readFile(join(appRoot, 'tsconfig.json')))
+
+const compiler = loadCompiler(appRoot, {
+  compilerOptions: tsConfig.compilerOptions,
+})
+
 export async function resolve(specifier, context, defaultResolve) {
   if (specifier.startsWith('@ioc:')) {
     return { url: `adonisjs://ioc?request=${encodeURIComponent(specifier)}` }
@@ -6,7 +20,7 @@ export async function resolve(specifier, context, defaultResolve) {
 }
 
 export async function getFormat(url, context, defaultGetFormat) {
-  if (url.startsWith('adonisjs://')) {
+  if (url.startsWith('adonisjs://') || url.endsWith('.ts')) {
     return { format: 'module' }
   }
   return defaultGetFormat(url, context, defaultGetFormat)
@@ -24,6 +38,9 @@ export async function getSource(url, context, defaultGetSource) {
     } else {
       throw new Error(`unknown host for:${urlObj.href}`)
     }
+  } else if (url.endsWith('.ts')) {
+    const compiled = await compileTs(url)
+    return { source: compiled }
   }
   return defaultGetSource(url, context, defaultGetSource)
 }
@@ -37,4 +54,9 @@ function buildModuleObject(bindingName, bindingValue) {
     result.push(`export const ${exportName} = __module__['${exportName}']`)
   }
   return result.join('\n')
+}
+
+async function compileTs(url) {
+  const contents = await readFile(new URL(url), 'utf-8')
+  return compiler.compile(url, contents)
 }
