@@ -1,3 +1,6 @@
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+
 import { listDirectoryFiles } from '@adonisjs/core/build/standalone.js'
 import Application from '@ioc:Adonis/Core/Application'
 
@@ -16,6 +19,8 @@ import Application from '@ioc:Adonis/Core/Application'
 | 2. We must ignore this file to avoid getting into an infinite loop
 |
 */
-export default listDirectoryFiles(__dirname, Application.appRoot, [
-  './commands/index',
-])
+export default listDirectoryFiles(
+  dirname(fileURLToPath(import.meta.url)),
+  Application.appRoot,
+  ['./commands/index'],
+)
